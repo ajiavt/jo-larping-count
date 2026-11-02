@@ -27,10 +27,10 @@ const limitScript = `
 `;
 
 async function redis(command) {
-  const response = await fetch(process.env.UPSTASH_REDIS_REST_URL, {
+  const response = await fetch(process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN}`,
+      Authorization: `Bearer ${process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(command),
@@ -54,7 +54,8 @@ export default {
       return json({ error: 'Metode tidak didukung.' }, 405, { Allow: 'GET, POST' });
     }
 
-    if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
+    if (!(process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL)
+      || !(process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN)) {
       return json({ error: 'Counter belum terhubung. Konfigurasikan Redis di Vercel dulu.' }, 503);
     }
 
