@@ -1,4 +1,4 @@
-import { people, levelOf, conditionFor, personSprite } from './characters.js';
+import { people, officeSeatIds, levelOf, conditionFor, personSprite } from './characters.js';
 
 const $ = (id) => document.getElementById(id);
 const hitButton = $('hit-button');
@@ -43,7 +43,7 @@ function officeReaction(id, action) {
   $('office-feed').textContent = action === 'hit' ? person.office : person.calm;
   speak(id, action === 'hit' ? conditionFor(person,levelOf(states[id]))[2] : 'Oke. Lebih baik.');
   if(action === 'hit') {
-    const other = id === 'agung' ? 'yasir' : people[(people.findIndex((entry)=>entry.id===id)+1)%people.length].id;
+    const other = id === 'agung' ? 'yasir' : officeSeatIds[(officeSeatIds.indexOf(id)+1)%officeSeatIds.length];
     speak(other,person.reply);
     $('office-room').classList.remove('rumble');
     if(id==='naufal' && levelOf(states[id])>=8) {
@@ -110,8 +110,8 @@ $('character-tabs').addEventListener('keydown',(event)=>{
   tabs[next].click();
   tabs[next].focus();
 });
-const occupants=[...people,{id:'yasir',name:'Yasir',title:'Departemen sebelah'}];
-$('office-panel').innerHTML=`<div class="office-workspace"><div class="office-room" id="office-room"><div class="office-window window-left"></div><div class="office-window window-right"></div><span class="room-sign">OPENSPACE / 06</span><span class="office-plant plant-one" aria-hidden="true">✳</span><span class="office-plant plant-two" aria-hidden="true">✳</span><div class="office-table"><div class="table-seam"></div>${occupants.map((person,index)=>`<div class="desk-setup setup-${index}" aria-hidden="true"><i class="monitor"></i><i class="keyboard"></i><i class="mug"></i></div>`).join('')}</div>${occupants.map((person,index)=>`<button class="office-person seat-${index}${person.id==='yasir'?' ghost-seat':''}" id="seat-${person.id}" type="button" aria-label="${person.id==='yasir'?'Ajak Yasir si hantu ngobrol':`Pilih counter ${person.name}`}"><span class="desk-chair" aria-hidden="true"></span><span class="office-sprite" id="office-sprite-${person.id}"></span><strong>${person.name}</strong><small id="seat-level-${person.id}">${person.id==='yasir'?'PINDAH DEPARTEMEN':'LV. 0'}</small></button><span class="office-bubble bubble-${index}" id="bubble-${person.id}"></span>`).join('')}<span class="floor-note">KLIK ORANGNYA, PILIH COUNTERNYA.</span></div><aside class="office-roster" aria-label="Kondisi penghuni kantor">${occupants.map((person)=>`<button class="roster-person" id="roster-${person.id}" type="button"><span class="roster-avatar" id="avatar-${person.id}"></span><span class="roster-info"><strong>${person.name}</strong><small id="mood-${person.id}">${person.id==='yasir'?'Hantu departemen sebelah':person.title}</small></span><span class="roster-count" id="roster-count-${person.id}">${person.id==='yasir'?'☁':'—'}</span></button>`).join('')}</aside></div><div class="office-caption"><p id="office-feed" role="status" aria-live="polite">Lima orang kerja. Satu hantu numpang nongkrong. Semua punya tingkah.</p><button id="open-counter" type="button">Lihat detail ↗</button></div>`;
+const occupants=officeSeatIds.map((id)=>people.find((person)=>person.id===id) || {id:'yasir',name:'Yasir',title:'Departemen sebelah'});
+$('office-panel').innerHTML=`<div class="office-workspace"><div class="office-room" id="office-room"><div class="office-window window-left"></div><div class="office-window window-right"></div><span class="room-sign">OPENSPACE / 06</span><span class="office-plant plant-one" aria-hidden="true">✳</span><span class="office-plant plant-two" aria-hidden="true">✳</span><div class="office-table"><div class="table-seam"></div>${occupants.map((person,index)=>`<div class="desk-setup setup-${index}" id="desk-${person.id}" aria-hidden="true"><i class="monitor"></i><i class="keyboard"></i><i class="mug"></i></div>`).join('')}</div>${occupants.map((person,index)=>`<button class="office-person seat-${index}${person.id==='yasir'?' ghost-seat':''}" id="seat-${person.id}" type="button" aria-label="${person.id==='yasir'?'Ajak Yasir si hantu ngobrol':`Pilih counter ${person.name}`}"><span class="desk-chair" aria-hidden="true"></span><span class="office-sprite" id="office-sprite-${person.id}"></span><strong>${person.name}</strong><small id="seat-level-${person.id}">${person.id==='yasir'?'PINDAH DEPARTEMEN':'LV. 0'}</small></button><span class="office-bubble bubble-${index}" id="bubble-${person.id}"></span>`).join('')}<span class="floor-note">KLIK ORANGNYA, PILIH COUNTERNYA.</span></div><aside class="office-roster" aria-label="Kondisi penghuni kantor">${occupants.map((person)=>`<button class="roster-person" id="roster-${person.id}" type="button"><span class="roster-avatar" id="avatar-${person.id}"></span><span class="roster-info"><strong>${person.name}</strong><small id="mood-${person.id}">${person.id==='yasir'?'Hantu departemen sebelah':person.title}</small></span><span class="roster-count" id="roster-count-${person.id}">${person.id==='yasir'?'☁':'—'}</span></button>`).join('')}</aside></div><div class="office-caption"><p id="office-feed" role="status" aria-live="polite">Lima orang kerja. Satu hantu numpang nongkrong. Semua punya tingkah.</p><button id="open-counter" type="button">Lihat detail ↗</button></div>`;
 occupants.forEach((person)=>{
   $(`seat-${person.id}`).addEventListener('click',()=>chooseCharacter(person.id,'office'));
   $(`roster-${person.id}`).addEventListener('click',()=>chooseCharacter(person.id,'office'));
@@ -147,13 +147,13 @@ async function playSound(kind) {
     const notes = {
       hit: [160, 90], heal: [330, 440, 660], level: [440, 554, 659, 880],
       max: [523, 659, 784, 1047, 1568], error: [120, 70],
-      anger: [120, 85, 55], love: [523, 659, 784], sad: [392, 330, 262], devil: [130, 155, 196], ghost: [440, 660, 440],
+      anger: [120, 85, 55], love: [523, 659, 784], sad: [392, 330, 262], devil: [130, 155, 196], ghost: [440, 660, 440], dizzy: [392, 415, 349, 370, 311],
     }[kind];
     notes.forEach((frequency, index) => {
       const oscillator = audio.createOscillator();
       const gain = audio.createGain();
       const start = audio.currentTime + index * 0.075;
-      oscillator.type = ['heal','love','ghost'].includes(kind) ? 'triangle' : 'square';
+      oscillator.type = ['heal','love','ghost','dizzy'].includes(kind) ? 'triangle' : 'square';
       oscillator.frequency.setValueAtTime(frequency, start);
       if (kind === 'hit') oscillator.frequency.exponentialRampToValueAtTime(frequency / 2, start + 0.08);
       gain.gain.setValueAtTime(0, start);
@@ -260,6 +260,15 @@ function renderOffice() {
     $(`seat-${person.id}`).classList.toggle('selected',person.id===selectedId);
     $(`roster-${person.id}`).classList.toggle('selected',person.id===selectedId);
     if(person.id!=='yasir') {
+      const seat=$(`seat-${person.id}`);
+      const desk=$(`desk-${person.id}`);
+      seat.classList.toggle('is-dragon',person.id==='naufal' && level>=9);
+      seat.classList.toggle('is-drunk',person.id==='zikri' && level>=6);
+      seat.classList.toggle('is-void',person.id==='aji' && level>=9);
+      desk.classList.toggle('is-scorched',person.id==='naufal' && level>=9);
+      desk.classList.toggle('is-messy',person.id==='zikri' && level>=6);
+      desk.classList.toggle('is-wrecked',person.id==='zikri' && level>=12);
+      desk.classList.toggle('is-muted',person.id==='aji' && level>=6);
       $(`seat-${person.id}`).setAttribute('aria-pressed',String(person.id===selectedId));
       $(`roster-${person.id}`).setAttribute('aria-pressed',String(person.id===selectedId));
       $(`seat-level-${person.id}`).textContent=`LV. ${level} · ${snapshot?.count ?? '—'}`;
@@ -313,13 +322,13 @@ function animateAction(type, label) {
   wrap.classList.add(type === 'heal' ? 'heal' : 'hit');
   const effect = document.createElement('span');
   effect.className = `hit-particle ${type}`;
-  effect.textContent = label || (type === 'heal' ? 'LEBIH BAIK.' : {jonathan:'BONK!',naufal:'BOOM!',zikri:'LOVE ♡',aji:'HUHU...',agung:'HALO?!'}[selectedId]);
+  effect.textContent = label || (type === 'heal' ? 'LEBIH BAIK.' : {jonathan:'BONK!',naufal:state && levelOf(state)>=9?'GRAWR!':'BOOM!',zikri:'OLENG!',aji:'...',agung:'HALO?!'}[selectedId]);
   $('hit-effects').append(effect);
   setTimeout(() => effect.remove(), 850);
   for (let i = 0; i < (type === 'critical' ? 12 : 5); i++) {
     const spark = document.createElement('i');
     spark.className = `pixel-spark ${type} particle-${selectedId}`;
-    if(selectedId==='zikri' && type!=='heal') spark.textContent='♥';
+    if(selectedId==='zikri' && type!=='heal') spark.textContent=['♥','↻','✦'][i%3];
     spark.style.setProperty('--x', `${30 + Math.random() * 40}%`);
     spark.style.setProperty('--y', `${15 + Math.random() * 35}%`);
     spark.style.setProperty('--dx', `${(Math.random() - .5) * 180}px`);

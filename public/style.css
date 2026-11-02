@@ -225,3 +225,33 @@ body[data-view=office] .next-damage{margin-top:14px}
 .person-svg:not(.ghost-svg):not(.dazed){animation:portrait-breathe 3s steps(2,end) infinite}
 @keyframes portrait-breathe{50%{translate:0 -1px}}
 @media(prefers-reduced-motion:reduce){.person-svg:not(.ghost-svg):not(.dazed){animation:none!important}}
+/* Tahap ekstrem juga terbaca dari kursi dan meja, tanpa mengubah angka counter. */
+.person-svg.mood-zikri.drunk{animation:drunk-sway 2.4s ease-in-out infinite;transform-origin:50% 90%}
+.person-svg.mood-zikri.stage-4,.person-svg.mood-zikri.stage-5{animation:drunk-sway 1.8s ease-in-out infinite}
+.person-svg.mood-aji.stage-1 .pixel-person{filter:grayscale(.25)}
+.person-svg.mood-aji.stage-2 .pixel-person{filter:grayscale(.55)}
+.person-svg.mood-aji.stage-3 .pixel-person{filter:grayscale(.8)}
+.person-svg.mood-aji.stage-4 .pixel-person,.person-svg.mood-aji.stage-5 .pixel-person{filter:grayscale(1)}
+.person-svg.mood-aji.stage-4,.person-svg.mood-aji.stage-5{animation:none}
+.person-svg.mood-aji.stage-5 .empty-eyes{opacity:.92}
+.dragon-breath{animation:fire-breath 1.8s ease-in-out infinite;transform-box:fill-box;transform-origin:left center}
+.dizzy-orbit{animation:orbit-bob 1.7s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.orbit-1{animation-delay:-.85s}
+.double-vision{animation:double-wobble 2.2s ease-in-out infinite}
+.rain{animation:rainfall 1.2s linear infinite}.rain-1{animation-delay:-.4s}.rain-2{animation-delay:-.8s}
+.office-person.is-dragon{z-index:5}
+.office-person.is-drunk{z-index:4}
+.office-person.is-void:before{content:'';position:absolute;inset:-30% -30% -5%;background:radial-gradient(ellipse,#66657345,transparent 70%);pointer-events:none;z-index:-1}
+.desk-setup.is-scorched .monitor{background:#251e20;border-color:#352727;box-shadow:0 3px 0 #201b1b,0 -3px 13px #e65b3155}
+.desk-setup.is-scorched .monitor:before{content:'';position:absolute;inset:0;z-index:2;background:#f6d7b9;clip-path:polygon(40% 0,52% 25%,35% 42%,62% 58%,45% 100%,39% 100%,53% 60%,26% 42%,44% 24%,34% 0)}
+.desk-setup.is-messy:after{content:'';position:absolute;left:15px;top:13px;width:16px;height:11px;background:#f3e8d5;border:1px solid #b9aa8c;transform:rotate(23deg);box-shadow:24px 13px 0 #eee0c5,-16px 18px 0 #f5ebd9;z-index:2;pointer-events:none}
+.desk-setup.is-wrecked:after{box-shadow:24px 13px 0 #eee0c5,-16px 18px 0 #f5ebd9,41px 5px 0 #e9dcc7,-26px -4px 0 #ede3cd}
+.desk-setup.is-messy .mug{transform:rotate(55deg);box-shadow:4px 4px 0 3px #977b5d55}
+.desk-setup.is-muted{filter:grayscale(1)}
+.desk-setup.is-muted .monitor:after{content:'...';font:12px var(--mono);color:#a3a4ac;width:auto;height:auto;background:none;box-shadow:none;top:0;left:7px}
+@keyframes drunk-sway{0%,100%{rotate:-4deg;translate:-2px 0}50%{rotate:5deg;translate:2px -2px}}
+@keyframes fire-breath{0%,100%{scale:.7 .65;opacity:.65}50%{scale:1 1.25;opacity:1}}
+@keyframes orbit-bob{50%{translate:2px -3px;rotate:12deg}}
+@keyframes double-wobble{50%{opacity:.08;translate:3px -1px}}
+@keyframes rainfall{0%{translate:0 -3px;opacity:.1}30%{opacity:.8}100%{translate:0 30px;opacity:.1}}
+@media(prefers-reduced-motion:reduce){.person-svg.mood-zikri.drunk,.person-svg.mood-zikri.stage-4,.person-svg.mood-zikri.stage-5,.dragon-breath,.dizzy-orbit,.double-vision,.rain{animation:none!important}}
