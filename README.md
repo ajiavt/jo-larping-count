@@ -5,13 +5,13 @@ Satu kantor pixel dari atas, lima counter bersama, dan enam penghuni. URL proyek
 | Karakter | Counter | Ciri dan progres |
 | --- | --- | --- |
 | Jonathan | Larping count | Kulit putih, makin bonyok |
-| Naufal | Angry count | Kacamata, makin merah, berapi, dan meledak |
-| Zikri | Zikli count | Lebih tinggi, makin penuh love |
-| Aji | Ngejokes ga lucu count | Rambut ikal dan jenggot tipis, makin sedih dan menangis |
+| Naufal | Angry count | Kacamata, membesar lalu berubah jadi naga yang menyemburkan api; kacamata tetap dipakai |
+| Zikri | Bahas cewek count | Lebih tinggi, makin mabok: pipi merah, mata spiral, lidah keluar, lihat dobel, sampai tumbang |
+| Aji | Ngejokes ga lucu count | Rambut ikal dan jenggot tipis, tinggi normal; makin pucat, kosong, hujan pribadi, dan menangis |
 | Agung | Solat ga tepat waktu count | Rambut mangkuk Rock Lee, malaikat berubah jadi iblis |
 | Yasir | Tanpa counter | Hantu yang sudah pindah departemen, bisa diajak ngobrol |
 
-Tab **Kantor** menampilkan meja persegi panjang dengan enam kursi, monitor, kursi kerja, dan tanaman. Klik penghuni atau daftar di samping untuk memilih target tombol `+1`/`−1`; nama target selalu tampil di atas tombol. **Lihat detail** dan tab nama membuka arena karakter. Mood mengikuti counter dan saling merespons lewat balon percakapan. Yasir hanya memberi dialog, tanpa mengubah counter. Pilihan karakter bisa dibagikan lewat hash, misalnya `#naufal` atau `#kantor`.
+Tab **Kantor** menampilkan meja persegi panjang dengan enam kursi, monitor, kursi kerja, dan tanaman. Urutan kiri ke kanan: baris atas **Yasir – Jonathan – Agung**, baris bawah **Naufal – Zikri – Aji**. Baju/sheet memakai inisial J, N, Z, A, A, Y. Aji memakai proporsi tinggi normal seperti Jonathan dan Agung; Zikri tetap lebih tinggi. Klik penghuni atau daftar di samping untuk memilih target tombol `+1`/`−1`; nama target selalu tampil di atas tombol. **Lihat detail** dan tab nama membuka arena karakter. Mood mengikuti counter dan saling merespons lewat balon percakapan. Perubahan tahap besar muncul tiap tiga level: bentuk naga, pose mabok, badai sedih, perban besar, dan sayap iblis. Meja Naufal ikut gosong/retak, meja Zikri berantakan, dan area Aji kehilangan warna di tahap lanjut. Yasir hanya memberi dialog, tanpa mengubah counter. Pilihan karakter bisa dibagikan lewat hash, misalnya `#naufal` atau `#kantor`.
 
 ## Perilaku
 
