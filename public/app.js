@@ -1,3 +1,5 @@
+import { people, levelOf, conditionFor, personSprite } from './characters.js';
+
 const $ = (id) => document.getElementById(id);
 const hitButton = $('hit-button');
 const forgiveButton = $('forgive-button');
@@ -6,7 +8,6 @@ const form = $('admin-form');
 const password = $('admin-password');
 const stepInput = $('damage-step');
 const submit = $('admin-submit');
-const injuries = [...document.querySelectorAll('[data-injury]')];
 let state = null;
 let hitting = false;
 let reading = false;
@@ -21,25 +22,106 @@ let audio, master;
 let soundEnabled = true;
 try { soundEnabled = localStorage.getItem('larping-count:sound') !== 'off'; } catch {}
 
-const conditions = [
-  ['Masih mulus.', 'Belum ada kerusakan.\nKepercayaan diri berlebih.', 'Gue mah kuat.', '100% CONFIDENCE'],
-  ['Sedikit lecet.', 'Baru kesenggol.\nMasih banyak gaya.', 'Cuma segitu?', 'JUST A SCRATCH'],
-  ['Mulai memar.', 'Pipi mulai berwarna.\nOmongan belum berkurang.', 'Oke, kerasa dikit.', 'EGO > HP'],
-  ['Senyum hilang.', 'Satu senyum tumbang.\nSeribu alasan datang.', 'Gue lagi nggak fokus.', 'SMILE NOT FOUND'],
-  ['Mata lebam.', 'Mata mulai protes.\nMulut masih aktif.', 'Ini cuma pemanasan.', 'VISION: QUESTIONABLE'],
-  ['Hidung protes.', 'Napas dulu sebentar.\nKatanya belum kapok.', 'Bentar, atur napas.', 'CONFIDENCE: SHAKY'],
-  ['Butuh plester.', 'Plester pertama terpasang.\nGengsi masih utuh.', 'Ada plester nggak?', 'PATCH UPDATE 1.0'],
-  ['Baju ikut kena.', 'Bukan cuma muka.\nOutfit juga terdampak.', 'Baju gue, bang...', 'OUTFIT DOWNGRADE'],
-  ['Bonyok beneran.', 'Kedua pipi sepakat.\nIni sudah kelewatan.', 'Kita santai dulu ya.', 'EGO TAKING DAMAGE'],
-  ['Tambah tambalan.', 'Plester nambah.\nAlasan juga nambah.', 'Gue bisa jelasin.', 'PATCH UPDATE 2.0'],
-  ['Mata tinggal niat.', 'Tatapan mulai kosong.\nGengsi masih nyala.', 'Masih... keliatan kok.', 'LOW BATTERY ENERGY'],
-  ['Babak belur.', 'Baju makin bolong.\nArgumen makin tipis.', 'Kayaknya cukup deh.', 'SEND HELP'],
-  ['Rambut menyerah.', 'Gaya rambut ikut mundur.\nMundur teratur, Jon.', 'Rambut gue ke mana?', 'BAD HAIR CENTURY'],
-  ['Diperban dulu.', 'Perban sudah melingkar.\nMinta maaf masih bisa.', 'Oke, gue dengerin.', 'RECOVERY REQUIRED'],
-  ['Lihat bintang.', 'Bintang muter di kepala.\nBukan tanda terkenal.', 'Kok ada bintang ya?', 'ORBITAL EGO DAMAGE'],
-  ['Bonyok legendaris.', 'Level 15. Piksel menyerah.\nSaatnya bilang maaf.', 'Iya... gue minta maaf.', 'CERTIFIED LARP LEGEND'],
-];
-const levelOf = (snapshot) => Math.min(15, Math.floor(snapshot.count / snapshot.step));
+const personFor = (id=selectedId) => people.find((person)=>person.id===id);
+let states = {};
+let selectedId = 'jonathan';
+let view = 'office';
+let adminCharacter = 'jonathan';
+const bubbleTimers = new Map();
+let ghostVisits = 0;
+
+function speak(id, text) {
+  const bubble = $(`bubble-${id}`);
+  clearTimeout(bubbleTimers.get(id));
+  bubble.textContent = text;
+  bubble.classList.add('show');
+  bubbleTimers.set(id,setTimeout(()=>bubble.classList.remove('show'),3200));
+}
+
+function officeReaction(id, action) {
+  const person = personFor(id);
+  $('office-feed').textContent = action === 'hit' ? person.office : person.calm;
+  speak(id, action === 'hit' ? conditionFor(person,levelOf(states[id]))[2] : 'Oke. Lebih baik.');
+  if(action === 'hit') {
+    const other = id === 'agung' ? 'yasir' : people[(people.findIndex((entry)=>entry.id===id)+1)%people.length].id;
+    speak(other,person.reply);
+    $('office-room').classList.remove('rumble');
+    if(id==='naufal' && levelOf(states[id])>=8) {
+      void $('office-room').offsetWidth;
+      $('office-room').classList.add('rumble');
+    }
+  }
+}
+
+function chooseCharacter(id, nextView=view) {
+  if(hitting || adminBusy || dialog.open) return;
+  if(id==='yasir') {
+    const lines=['Gue udah pindah departemen, tapi masih nongkrong.','Tenang, gue cuma numpang Wi-Fi.','Departemen baru, meja lama tetap dihantui.','Jangan lupa istirahat, para penghuni kantor.'];
+    const text=lines[ghostVisits++%lines.length];
+    speak('yasir',text);
+    $('office-feed').textContent=`Yasir: “${text}”`;
+    playSound('ghost');
+    return;
+  }
+  if(!personFor(id)) return;
+  selectedId=id;
+  view=nextView;
+  state=states[id] || null;
+  resetCombo();
+  clearTimeout(eventTimer);
+  $('level-event').classList.remove('show');
+  $('hit-effects').replaceChildren();
+  $('sprite-wrap').classList.remove('hit','heal');
+  $('feedback').textContent='';
+  document.body.dataset.person=id;
+  document.body.dataset.view=view;
+  document.documentElement.style.setProperty('--accent',personFor().accent);
+  $('arena-panel').hidden=view==='office';
+  $('office-panel').hidden=view!=='office';
+  $('arena-panel').setAttribute('aria-labelledby',`tab-${id}`);
+  $('office-panel').setAttribute('aria-labelledby','tab-office');
+  document.querySelectorAll('[role="tab"]').forEach((tab)=>{
+    const active=tab.id===`tab-${view==='office'?'office':id}`;
+    tab.setAttribute('aria-selected',String(active));
+    tab.tabIndex=active?0:-1;
+  });
+  $('scene-label').textContent=view==='office'?'OPENSPACE · ENAM PENGHUNI':`${personFor().name.toUpperCase()} · ${personFor().title.toUpperCase()}`;
+  document.title=view==='office'?'Kantor Count — satu meja, banyak tingkah.':`${personFor().name} — ${personFor().title} · Kantor Count`;
+  history.replaceState(null,'',`#${view==='office'?'kantor':id}`);
+  renderSelected();
+  renderOffice();
+  if(view==='office' && states[id]) speak(id,conditionFor(personFor(),levelOf(states[id]))[2]);
+}
+
+$('character-tabs').innerHTML='<button id="tab-office" class="person-tab" role="tab" type="button" aria-selected="true" aria-controls="office-panel">▦ <span>Kantor<small>SEMUA KUMPUL</small></span></button>'+people.map((person)=>`<button id="tab-${person.id}" class="person-tab" data-person="${person.id}" role="tab" type="button" aria-selected="false" aria-controls="arena-panel" tabindex="-1"><span class="tab-dot" aria-hidden="true"></span><span>${person.name}<small>${person.title}</small></span></button>`).join('');
+$('tab-office').addEventListener('click',()=>chooseCharacter(selectedId,'office'));
+people.forEach((person)=>$(`tab-${person.id}`).addEventListener('click',()=>chooseCharacter(person.id,'arena')));
+$('character-tabs').addEventListener('keydown',(event)=>{
+  const tabs=[...document.querySelectorAll('[role="tab"]')];
+  const index=tabs.indexOf(document.activeElement);
+  if(index<0 || hitting || adminBusy) return;
+  let next;
+  if(event.key==='ArrowRight') next=(index+1)%tabs.length;
+  else if(event.key==='ArrowLeft') next=(index+tabs.length-1)%tabs.length;
+  else if(event.key==='Home') next=0;
+  else if(event.key==='End') next=tabs.length-1;
+  if(next===undefined) return;
+  event.preventDefault();
+  tabs[next].click();
+  tabs[next].focus();
+});
+const occupants=[...people,{id:'yasir',name:'Yasir',title:'Departemen sebelah'}];
+$('office-panel').innerHTML=`<div class="office-workspace"><div class="office-room" id="office-room"><div class="office-window window-left"></div><div class="office-window window-right"></div><span class="room-sign">OPENSPACE / 06</span><span class="office-plant plant-one" aria-hidden="true">✳</span><span class="office-plant plant-two" aria-hidden="true">✳</span><div class="office-table"><div class="table-seam"></div>${occupants.map((person,index)=>`<div class="desk-setup setup-${index}" aria-hidden="true"><i class="monitor"></i><i class="keyboard"></i><i class="mug"></i></div>`).join('')}</div>${occupants.map((person,index)=>`<button class="office-person seat-${index}${person.id==='yasir'?' ghost-seat':''}" id="seat-${person.id}" type="button" aria-label="${person.id==='yasir'?'Ajak Yasir si hantu ngobrol':`Pilih counter ${person.name}`}"><span class="desk-chair" aria-hidden="true"></span><span class="office-sprite" id="office-sprite-${person.id}"></span><strong>${person.name}</strong><small id="seat-level-${person.id}">${person.id==='yasir'?'PINDAH DEPARTEMEN':'LV. 0'}</small></button><span class="office-bubble bubble-${index}" id="bubble-${person.id}"></span>`).join('')}<span class="floor-note">KLIK ORANGNYA, PILIH COUNTERNYA.</span></div><aside class="office-roster" aria-label="Kondisi penghuni kantor">${occupants.map((person)=>`<button class="roster-person" id="roster-${person.id}" type="button"><span class="roster-avatar" id="avatar-${person.id}"></span><span class="roster-info"><strong>${person.name}</strong><small id="mood-${person.id}">${person.id==='yasir'?'Hantu departemen sebelah':person.title}</small></span><span class="roster-count" id="roster-count-${person.id}">${person.id==='yasir'?'☁':'—'}</span></button>`).join('')}</aside></div><div class="office-caption"><p id="office-feed" role="status" aria-live="polite">Lima orang kerja. Satu hantu numpang nongkrong. Semua punya tingkah.</p><button id="open-counter" type="button">Lihat detail ↗</button></div>`;
+occupants.forEach((person)=>{
+  $(`seat-${person.id}`).addEventListener('click',()=>chooseCharacter(person.id,'office'));
+  $(`roster-${person.id}`).addEventListener('click',()=>chooseCharacter(person.id,'office'));
+});
+$('open-counter').addEventListener('click',()=>chooseCharacter(selectedId,'arena'));
+function fromHash() {
+  const id=location.hash.slice(1);
+  chooseCharacter(personFor(id)?id:selectedId,personFor(id)?'arena':'office');
+}
+window.addEventListener('hashchange',fromHash);
 
 function updateSoundButton() {
   $('sound-button').setAttribute('aria-pressed', String(soundEnabled));
@@ -65,12 +147,13 @@ async function playSound(kind) {
     const notes = {
       hit: [160, 90], heal: [330, 440, 660], level: [440, 554, 659, 880],
       max: [523, 659, 784, 1047, 1568], error: [120, 70],
+      anger: [120, 85, 55], love: [523, 659, 784], sad: [392, 330, 262], devil: [130, 155, 196], ghost: [440, 660, 440],
     }[kind];
     notes.forEach((frequency, index) => {
       const oscillator = audio.createOscillator();
       const gain = audio.createGain();
       const start = audio.currentTime + index * 0.075;
-      oscillator.type = kind === 'heal' ? 'triangle' : 'square';
+      oscillator.type = ['heal','love','ghost'].includes(kind) ? 'triangle' : 'square';
       oscillator.frequency.setValueAtTime(frequency, start);
       if (kind === 'hit') oscillator.frequency.exponentialRampToValueAtTime(frequency / 2, start + 0.08);
       gain.gain.setValueAtTime(0, start);
@@ -97,10 +180,10 @@ $('sound-button').addEventListener('click', () => {
 updateSoundButton();
 
 async function request(body) {
-  const response = await fetch('/api/counter', {
+  const response = await fetch(`/api/counter?character=${encodeURIComponent(body?.character || selectedId)}`, {
     method: body ? 'POST' : 'GET',
     headers: body ? { 'Content-Type': 'application/json' } : {},
-    ...(body ? { body: JSON.stringify(body) } : {}),
+    ...(body ? { body: JSON.stringify({ ...body, character: body.character || selectedId }) } : {}),
     cache: 'no-store',
     signal: AbortSignal.timeout(12000),
   });
@@ -117,41 +200,85 @@ function connection(online) {
 function syncControls() {
   hitButton.disabled = !state || hitting || adminBusy || uncertain;
   forgiveButton.disabled = hitButton.disabled || state.count === 0;
+  document.querySelectorAll('.person-tab,.office-person,.roster-person,#open-counter').forEach((button)=>{button.disabled=hitting || adminBusy;});
+}
+
+function renderSelected() {
+  const person=personFor();
+  const snapshot=state || {count:0,step:3,revision:0};
+  const level=levelOf(snapshot);
+  const remaining=snapshot.step-snapshot.count%snapshot.step;
+  const [condition,caption,speech,stamp]=conditionFor(person,level);
+  $('counter-label').textContent=person.label;
+  $('counter-caption').textContent=person.caption;
+  $('watermark').textContent=person.name.toUpperCase();
+  $('hero-name').textContent=person.name.toUpperCase();
+  $('count').textContent=state?String(state.count).padStart(4,'0'):'—';
+  $('count').ariaLabel=`${person.name}, ${person.title}, ${state?.count ?? 'belum terhubung'}`;
+  $('level').textContent=level;
+  $('level-label').textContent=`${String(level).padStart(2,'0')} / 15`;
+  $('report-label').textContent=`${person.effect.toUpperCase()} REPORT`;
+  $('condition').textContent=condition;
+  $('condition-panel').setAttribute('aria-label',`Kondisi ${person.name}`);
+  $('damage-caption').textContent=caption;
+  $('speech').textContent=speech;
+  $('damage-stamp').textContent=stamp;
+  const spriteKey=`${selectedId}:${level}`;
+  if($('jonathan').dataset.spriteKey!==spriteKey) {
+    $('jonathan').innerHTML=personSprite(selectedId,level);
+    $('jonathan').dataset.spriteKey=spriteKey;
+  }
+  $('damage-meter').setAttribute('aria-valuenow',level);
+  $('damage-meter').setAttribute('aria-label',`Level ${person.effect} ${person.name}`);
+  [...$('damage-meter').children].forEach((segment,index)=>segment.classList.toggle('active',index<level));
+  $('level-progress').max=snapshot.step;
+  $('level-progress').value=level===15?snapshot.step:snapshot.count%snapshot.step;
+  $('progress-label').textContent=level===15?'MAX LEVEL REACHED':'NEXT LEVEL';
+  $('next-description').textContent=level===15?'Kurangi counter buat mulai pulih.':`${remaining} count ke level ${level+1}`;
+  $('next-count').textContent=level===15?'LEVEL MAKS.':`${remaining} count`;
+  $('next-copy').textContent=level===15?` ${person.name} butuh jeda.`:` lagi sampai makin ${person.effect}.`;
+  $('step-value').textContent=snapshot.step;
+  $('action-label').textContent=person.action;
+  $('undo-label').textContent=person.undo+' ♡';
+  $('active-counter').textContent=`${person.name.toUpperCase()} · ${person.title.toUpperCase()}${view==='office'?` · ${state?.count ?? '—'}`:''}`;
+  document.body.classList.toggle('max-damage',level===15);
+  syncControls();
+}
+
+function renderOffice() {
+  occupants.forEach((person)=>{
+    const snapshot=states[person.id];
+    const level=snapshot?levelOf(snapshot):0;
+    const key=`${person.id}:${level}`;
+    for(const prefix of ['office-sprite','avatar']) {
+      const portrait=$(`${prefix}-${person.id}`);
+      if(portrait.dataset.spriteKey!==key) {
+        portrait.innerHTML=personSprite(person.id,level);
+        portrait.dataset.spriteKey=key;
+      }
+    }
+    $(`seat-${person.id}`).classList.toggle('selected',person.id===selectedId);
+    $(`roster-${person.id}`).classList.toggle('selected',person.id===selectedId);
+    if(person.id!=='yasir') {
+      $(`seat-${person.id}`).setAttribute('aria-pressed',String(person.id===selectedId));
+      $(`roster-${person.id}`).setAttribute('aria-pressed',String(person.id===selectedId));
+      $(`seat-level-${person.id}`).textContent=`LV. ${level} · ${snapshot?.count ?? '—'}`;
+      $(`roster-count-${person.id}`).textContent=snapshot?.count ?? '—';
+      $(`mood-${person.id}`).textContent=conditionFor(person,level)[0];
+    }
+  });
+  $('office-room').classList.toggle('hot-office',states.naufal && levelOf(states.naufal)>=12);
 }
 
 function render(next) {
-  if (state && next.revision < state.revision) return false;
-  const changed = state && next.count !== state.count;
-  state = next;
-  const level = levelOf(state);
-  const remaining = state.step - state.count % state.step;
-  const [condition, caption, speech, stamp] = conditions[level];
-  $('count').textContent = String(state.count).padStart(4, '0');
-  $('count').ariaLabel = `Total ${state.count} larp`;
-  $('level').textContent = level;
-  $('level-label').textContent = `${String(level).padStart(2, '0')} / 15`;
-  $('condition').textContent = condition;
-  $('damage-caption').textContent = caption;
-  $('speech').textContent = speech;
-  $('damage-stamp').textContent = stamp;
-  $('jonathan').dataset.damage = level;
-  $('jonathan').classList.toggle('hurt-eyes', level >= 4);
-  $('jonathan').classList.toggle('hurt-mouth', level >= 3);
-  $('jonathan').classList.toggle('dazed', level >= 14);
-  $('jonathan').setAttribute('aria-label', `Jonathan, level ${level} dari 15, ${condition.toLowerCase()}`);
-  injuries.forEach((injury) => injury.classList.toggle('visible', Number(injury.dataset.injury) <= level));
-  $('damage-meter').setAttribute('aria-valuenow', level);
-  [...$('damage-meter').children].forEach((segment, index) => segment.classList.toggle('active', index < level));
-  $('level-progress').max = state.step;
-  $('level-progress').value = level === 15 ? state.step : state.count % state.step;
-  $('progress-label').textContent = level === 15 ? 'MAX LEVEL REACHED' : 'NEXT LEVEL';
-  $('next-description').textContent = level === 15 ? 'Minta maaf buat mulai pulih.' : `${remaining} larp ke level ${level + 1}`;
-  $('next-count').textContent = level === 15 ? 'LEVEL MAKS.' : `${remaining} larp`;
-  $('next-copy').textContent = level === 15 ? ' Jonathan butuh minta maaf.' : ' lagi sampai makin bonyok.';
-  $('step-value').textContent = state.step;
-  document.body.classList.toggle('max-damage', level === 15);
-  syncControls();
-  if (changed) {
+  const previous=state;
+  for(const [id,snapshot] of Object.entries(next.characters || {jonathan:next})) {
+    if(personFor(id) && (!states[id] || snapshot.revision>=states[id].revision)) states[id]=snapshot;
+  }
+  state=states[selectedId] || null;
+  renderSelected();
+  renderOffice();
+  if(previous && state && previous.count!==state.count) {
     $('count').classList.remove('pop');
     void $('count').offsetWidth;
     $('count').classList.add('pop');
@@ -186,12 +313,13 @@ function animateAction(type, label) {
   wrap.classList.add(type === 'heal' ? 'heal' : 'hit');
   const effect = document.createElement('span');
   effect.className = `hit-particle ${type}`;
-  effect.textContent = label || (type === 'heal' ? 'MAAF DITERIMA.' : ['OOF!', 'BONK!', 'OUCH!', '+1'][Math.floor(Math.random() * 4)]);
+  effect.textContent = label || (type === 'heal' ? 'LEBIH BAIK.' : {jonathan:'BONK!',naufal:'BOOM!',zikri:'LOVE ♡',aji:'HUHU...',agung:'HALO?!'}[selectedId]);
   $('hit-effects').append(effect);
   setTimeout(() => effect.remove(), 850);
   for (let i = 0; i < (type === 'critical' ? 12 : 5); i++) {
     const spark = document.createElement('i');
-    spark.className = `pixel-spark ${type}`;
+    spark.className = `pixel-spark ${type} particle-${selectedId}`;
+    if(selectedId==='zikri' && type!=='heal') spark.textContent='♥';
     spark.style.setProperty('--x', `${30 + Math.random() * 40}%`);
     spark.style.setProperty('--y', `${15 + Math.random() * 35}%`);
     spark.style.setProperty('--dx', `${(Math.random() - .5) * 180}px`);
@@ -204,7 +332,7 @@ function animateAction(type, label) {
 
 function announceLevel(level) {
   clearTimeout(eventTimer);
-  $('level-event').textContent = level === 15 ? 'MAX LEVEL · LARP LEGEND' : `LEVEL ${level} · MAKIN BONYOK!`;
+  $('level-event').textContent = level === 15 ? `MAX LEVEL · ${personFor().name.toUpperCase()} LEGEND` : `LEVEL ${level} · MAKIN ${personFor().effect.toUpperCase()}!`;
   $('level-event').classList.remove('show');
   void $('level-event').offsetWidth;
   $('level-event').classList.add('show');
@@ -219,11 +347,14 @@ async function refresh() {
     const next = await request();
     if (mutationAtStart !== mutation) return;
     const previous = state;
+    const changedPerson=people.find((person)=>states[person.id] && next.characters?.[person.id] && next.characters[person.id].count!==states[person.id].count);
+    const officeAction=changedPerson && next.characters[changedPerson.id].count>states[changedPerson.id].count?'hit':'forgive';
     if (render(next) && previous) {
-      if (next.count > previous.count) animateAction('hit');
-      else if (next.count < previous.count) { resetCombo(); animateAction('heal', 'LEBIH BAIK.'); }
-      if (levelOf(next) > levelOf(previous)) announceLevel(levelOf(next));
+      if (state.count > previous.count) animateAction('hit');
+      else if (state.count < previous.count) { resetCombo(); animateAction('heal', 'LEBIH BAIK.'); }
+      if (levelOf(state) > levelOf(previous)) announceLevel(levelOf(state));
     }
+    if(changedPerson) officeReaction(changedPerson.id,officeAction);
     uncertain = false;
     syncControls();
     $('feedback').textContent = '';
@@ -244,14 +375,15 @@ async function changeCount(action) {
   button.classList.add('busy');
   button.setAttribute('aria-busy', 'true');
   $('feedback').textContent = '';
-  playSound(action === 'hit' ? 'hit' : 'heal');
-  animateAction(action === 'hit' ? 'hit' : 'heal', action === 'forgive' ? 'MAAF DITERIMA.' : undefined);
+  playSound(action === 'hit' ? personFor().sound : 'heal');
+  animateAction(action === 'hit' ? 'hit' : 'heal', action === 'forgive' ? 'LEBIH BAIK.' : undefined);
   const previous = state;
   try {
     const next = await request({ action });
     if (render(next)) {
+      officeReaction(selectedId,action);
       if (action === 'hit' && next.count > previous.count) addCombo();
-      if (action === 'forgive') { resetCombo(); $('feedback').textContent = '−1 larp. Satu maaf, satu kesempatan.'; }
+      if (action === 'forgive') { resetCombo(); $('feedback').textContent = `−1 untuk ${personFor().name}. ${personFor().undo.toLowerCase()}.`; }
       if (levelOf(next) > levelOf(previous)) {
         animateAction('critical', 'LEVEL UP!');
         announceLevel(levelOf(next));
@@ -278,16 +410,18 @@ forgiveButton.addEventListener('click', () => changeCount('forgive'));
 function openAdmin(action) {
   if (adminBusy || hitting) return;
   adminAction = action;
+  adminCharacter=selectedId;
   form.reset();
   password.value = '';
   stepInput.value = state?.step || 3;
   stepInput.disabled = action === 'reset';
   $('step-field').hidden = action === 'reset';
   $('admin-error').textContent = '';
-  $('dialog-title').textContent = action === 'reset' ? 'Kasih dia kesempatan?' : 'Atur tingkat penderitaan.';
+  $('dialog-title').textContent = action === 'reset' ? `Reset ${personFor().name}?` : `Atur level ${personFor().name}.`;
+  $('step-question').textContent=`${personFor().name} naik level setiap berapa count?`;
   $('dialog-description').textContent = action === 'reset'
-    ? 'Counter semua pengunjung kembali ke 0. Jonathan kembali mulus. Kelipatan tetap sama.'
-    : 'Makin kecil kelipatannya, makin cepat Jonathan bonyok. Berlaku untuk semua pengunjung.';
+    ? `Counter ${personFor().name} untuk semua pengunjung kembali ke 0. Counter orang lain tidak ikut direset.`
+    : `Kelipatan hanya berlaku untuk ${personFor().name}. Makin kecil, makin cepat level ${personFor().effect} naik.`;
   submit.textContent = action === 'reset' ? 'Reset counter ↺' : 'Simpan setting ↗';
   dialog.showModal();
   password.focus();
@@ -310,12 +444,13 @@ form.addEventListener('submit', async (event) => {
   try {
     const next = await request({
       action: adminAction,
+      character: adminCharacter,
       password: password.value,
       ...(adminAction === 'settings' ? { step: Number(stepInput.value) } : {}),
     });
     render(next);
     resetCombo();
-    $('feedback').textContent = adminAction === 'reset' ? 'Fresh start. Jonathan berterima kasih.' : `Beres. Jonathan makin bonyok setiap ${next.step} larp.`;
+    $('feedback').textContent = adminAction === 'reset' ? `Fresh start untuk ${personFor().name}.` : `${personFor().name} naik level setiap ${next.step} count.`;
     dialog.close();
   } catch (error) {
     $('admin-error').textContent = error.message === 'Failed to fetch' ? 'Koneksi terputus. Tutup dialog dan tunggu sinkronisasi.' : error.message;
@@ -332,6 +467,7 @@ document.addEventListener('visibilitychange', () => {
   else { resetCombo(); if (audio?.state === 'running') audio.suspend().catch(() => {}); }
 });
 window.addEventListener('online', refresh);
+fromHash();
 // shortcut: polling delapan detik untuk sinkronisasi ringan, pakai push jika butuh update seketika.
 setInterval(refresh, 8000);
 refresh();

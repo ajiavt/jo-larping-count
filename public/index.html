@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f4f0e7">
-  <meta name="description" content="Jonathan satu layar. 15 level bonyok, combo arcade, suara, dan kesempatan minta maaf. Counter bareng untuk semua.">
-  <title>Larping Count — Jonathan can take it. Probably.</title>
+  <meta name="description" content="Satu kantor, lima counter, enam penghuni. Jonathan, Naufal, Zikri, Aji, Agung, dan hantu Yasir dalam kantor pixel interaktif.">
+  <title>Kantor Count — satu meja, banyak tingkah.</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/style.css">
   <script type="module" src="/app.js"></script>
@@ -13,7 +13,7 @@
 <body>
   <div class="page">
     <header class="topbar">
-      <a class="brand" href="/" aria-label="Larping Count, beranda"><span class="brand-icon" aria-hidden="true">✚</span> LARPING COUNT<span class="brand-period">®</span></a>
+      <a class="brand" href="/" aria-label="Larping Count, beranda"><span class="brand-icon" aria-hidden="true">✚</span> KANTOR COUNT<span class="brand-period">®</span></a>
       <div class="utilities">
         <button class="utility" id="sound-button" type="button" aria-label="Suara aktif, klik untuk membisukan" aria-pressed="true"><span id="sound-icon" aria-hidden="true">♫</span><span id="sound-label">Sound on</span></button>
         <button class="utility" id="reset-button" type="button"><span aria-hidden="true">↺</span> <span>Reset</span><svg class="lock" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 7V5a3 3 0 0 1 6 0v2M3 7h10v7H3z"/></svg></button>
@@ -21,68 +21,32 @@
       </div>
     </header>
 
+    <nav class="character-tabs" id="character-tabs" role="tablist" aria-label="Pilih kantor atau counter karakter"></nav>
     <main>
-      <h1 class="sr-only" id="title">Larping Count — Jonathan</h1>
-      <section class="game" aria-label="Arena Jonathan">
-        <div class="arena-top"><span><span class="live-dot" id="live-dot"></span><span id="connection">MENGHUBUNGKAN</span></span><span>SUBJECT NO. 001 <span class="small-cross" aria-hidden="true">✚</span></span></div>
-        <div class="arena-body">
-          <span class="arena-watermark" aria-hidden="true">JONATHAN</span>
+      <h1 class="sr-only" id="title">Kantor Count</h1>
+      <section class="game" aria-label="Kantor dan counter karakter">
+        <div class="arena-top"><span><span class="live-dot" id="live-dot"></span><span id="connection">MENGHUBUNGKAN</span></span><span><span id="scene-label">SATU MEJA · ENAM PENGHUNI</span> <span class="small-cross" aria-hidden="true">✚</span></span></div>
+        <div class="arena-body" id="arena-panel" role="tabpanel" hidden>
+          <span class="arena-watermark" id="watermark" aria-hidden="true">JONATHAN</span>
           <div class="counter-panel">
-            <p class="eyebrow">TOTAL LARPS</p>
+            <p class="eyebrow" id="counter-label">TOTAL LARPS</p>
             <p class="count" id="count" aria-label="Total larp" aria-live="polite">—</p>
-            <span class="counter-caption">omong gede, piksel kecil.</span>
+            <span class="counter-caption" id="counter-caption">omong gede, piksel kecil.</span>
             <p class="combo" id="combo" aria-live="polite">LET’S GO AGAIN.</p>
           </div>
 
           <div class="character-stage">
             <div class="speech" id="speech">Gue mah kuat.</div>
             <div class="sprite-wrap" id="sprite-wrap">
-              <svg id="jonathan" viewBox="0 0 64 80" role="img" aria-label="Jonathan, masih mulus" shape-rendering="crispEdges">
-                <ellipse cx="32" cy="76" rx="24" ry="3" fill="#d8cdb8"/>
-                <g id="sprite">
-                  <path fill="#302a2a" d="M20 54h24v18h-2v4H30v-4h-2v4H16v-5h3V59h1z"/>
-                  <path fill="#736f7c" d="M22 57h9v11h-9zm12 0h8v11h-8z"/>
-                  <path fill="#f5e3ca" d="M21 66h7v6h-7zm14 0h6v6h-6z"/>
-                  <path fill="#f7f2e8" d="M18 72h11v3H17v-2h1zm15 0h10v3H33z"/>
-                  <path fill="#292731" d="M20 34h24v3h5v3h3v15h-4v5H16v-5h-4V40h3v-3h5z"/>
-                  <path fill="#3f5668" d="M21 37h22v3h5v9h-6v8H22v-8h-6v-9h5z"/>
-                  <path fill="#536d7b" d="M22 40h5v14h-5zm21 0h3v7h-3z"/>
-                  <path fill="#c5c2aa" d="M29 44h7v2h-2v6h-3v-6h-2z"/>
-                  <path fill="#f0c399" d="M13 49h7v10h-7zm31 0h7v10h-7z"/>
-                  <path fill="#d99d79" d="M13 55h3v4h-3zm31 0h3v4h-3z"/>
-                  <path fill="#302a2a" d="M21 5h22v3h5v5h3v17h-3v6h-5v4H22v-4h-5v-6h-3V14h3V8h4z"/>
-                  <path fill="#f0c399" d="M20 16h25v5h3v7h-3v6h-5v3H24v-3h-4v-6h-3v-7h3z"/>
-                  <path fill="#d99d79" d="M20 26h3v7h-3zm21 5h4v3h-4zm-15 4h13v2H26z"/>
-                  <path fill="#46362e" d="M18 13h3V9h20v3h5v8h-5v-3h-7v-3h-7v5h-6v4h-3z"/>
-                  <path fill="#665042" d="M22 10h14v3H22zm-3 5h3v3h-3zm18-1h5v2h-5z"/>
-                  <g id="normal-eyes"><path fill="#302a2a" d="M24 22h3v4h-3zm13 0h3v4h-3z"/><path fill="#fff4dc" d="M24 22h1v1h-1zm13 0h1v1h-1z"/></g>
-                  <path fill="#c38468" d="M31 26h3v3h-3z"/>
-                  <path id="smile" fill="#553b34" d="M27 30h3v2h7v-2h2v4H27z"/>
-                  <g class="injury" data-injury="1"><path fill="#c17670" d="M20 27h6v3h-6z"/><path fill="#ad5b61" d="M21 27h2v2h-2z"/></g>
-                  <g class="injury" data-injury="2"><path fill="#96758d" d="M35 21h8v7h-8z"/><path fill="#634e68" d="M36 23h6v2h-6z"/><path fill="#d69c92" d="M35 27h8v2h-8z"/></g>
-                  <g class="injury" data-injury="3"><path fill="#a84e4c" d="M20 15h2v6h-2zm2 4h2v4h-2zM35 31h4v4h-4z"/><path fill="#50333c" d="M27 31h11v4H27z"/><path fill="#fff0d5" d="M28 31h3v2h-3z"/></g>
-                  <g class="injury" data-injury="4"><path fill="#775c7e" d="M22 21h7v6h-7z"/><path fill="#4d394e" d="M23 23h5v2h-5z"/><path fill="#e2b78c" d="M37 14h7v3h-7zm2-2h3v7h-3z"/><path fill="#b9846c" d="M39 14h3v3h-3z"/><path fill="#dba77f" d="M23 50h7v4h-7z"/><path fill="#292731" d="M26 49h3v2h-3z"/></g>
-                  <g class="injury" data-injury="5"><path fill="#be746d" d="M27 26h9v4h-9z"/><path fill="#8e4e60" d="M25 27h2v3h-2zm10 1h5v3h-5z"/><path fill="#302a2a" d="M19 8h4v4h-4zm19-3h4v5h-4z"/><path fill="#dba77f" d="M38 43h5v8h-5z"/><path fill="#292731" d="M38 46h3v2h-3z"/></g>
-                  <g class="injury" data-injury="6"><path fill="#f6dfb6" d="M18 23h6v3h-6zm2-2h2v7h-2z"/><path fill="#bc886e" d="M20 23h2v3h-2z"/></g>
-                  <g class="injury" data-injury="7"><path fill="#9f7588" d="M14 50h4v5h-4zm31 4h4v4h-4z"/><path fill="#e8b78e" d="M31 53h5v4h-5z"/></g>
-                  <g class="injury" data-injury="8"><path fill="#9d657b" d="M39 28h6v4h-6z"/><path fill="#c18b82" d="M41 28h2v3h-2z"/></g>
-                  <g class="injury" data-injury="9"><path fill="#ead9b5" d="M27 39h10v4H27z"/><path fill="#c6977c" d="M31 39h3v4h-3z"/></g>
-                  <g class="injury" data-injury="10"><path fill="#6c516d" d="M22 26h7v3h-7zm13 0h8v3h-8z"/><path fill="#3c303a" d="M23 22h6v2h-6zm12 0h7v2h-7z"/></g>
-                  <g class="injury" data-injury="11"><path fill="#e8b78e" d="M22 42h4v6h-4zm13 9h7v5h-7z"/><path fill="#292731" d="M24 44h2v2h-2zm13 7h2v3h-2z"/><path fill="#9f958c" d="M18 73h5v2h-5zm18 0h4v2h-4z"/></g>
-                  <g class="injury" data-injury="12"><path fill="#f0c399" d="M30 14h8v4h-8z"/><path fill="#665042" d="M27 10h3v3h-3zm11 3h4v2h-4z"/></g>
-                  <g class="injury" data-injury="13"><path fill="#f9efda" d="M19 15h27v4H19z"/><path fill="#c8baa6" d="M22 15h2v4h-2zm17 0h2v4h-2z"/><path fill="#bd8b79" d="M30 16h5v2h-5z"/></g>
-                  <g class="injury" data-injury="14"><path fill="#7bb1be" d="M21 29h2v5h-2zm20 1h2v5h-2z"/><path fill="#dbad4b" d="M7 12h3V9h2v3h3v2h-3v3h-2v-3H7zm43-4h3V5h2v3h3v2h-3v3h-2v-3h-3z"/></g>
-                  <g class="injury" data-injury="15"><path fill="#443343" d="M23 22h2v2h-2zm4 0h2v2h-2zm-2 2h2v2h-2zm-2 2h2v2h-2zm4 0h2v2h-2z"/><path fill="#4b3543" d="M35 22h2v2h-2zm4 0h2v2h-2zm-2 2h2v2h-2zm-2 2h2v2h-2zm4 0h2v2h-2z"/><path fill="#e5b4ac" d="M29 33h6v3h-6v4h-3v-6h3z"/><path fill="#f4e2c8" d="M23 11h7v3h-7zm2-2h3v7h-3z"/></g>
-                </g>
-              </svg>
+              <div id="jonathan" class="portrait"></div>
               <div id="hit-effects" aria-hidden="true"></div>
             </div>
-            <div class="character-name">JONATHAN <span>LV. <span id="level">0</span> / 15</span></div>
+            <div class="character-name"><strong id="hero-name">JONATHAN</strong> <span>LV. <span id="level">0</span> / 15</span></div>
             <div class="level-event" id="level-event" role="status" aria-live="polite"></div>
           </div>
 
-          <aside class="damage-panel" aria-label="Kondisi Jonathan">
-            <p class="eyebrow">DAMAGE REPORT <span id="level-label">00 / 15</span></p>
+          <aside id="condition-panel" class="damage-panel" aria-label="Kondisi Jonathan">
+            <p class="eyebrow"><span id="report-label">DAMAGE REPORT</span> <span id="level-label">00 / 15</span></p>
             <p class="condition" id="condition">Masih mulus.</p>
             <div class="damage-meter" id="damage-meter" role="meter" aria-label="Tingkat bonyok" aria-valuemin="0" aria-valuemax="15" aria-valuenow="0"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
             <p class="damage-caption" id="damage-caption">Belum ada kerusakan.<br>Untuk sekarang.</p>
@@ -92,19 +56,21 @@
             <p class="next-description" id="next-description">3 larp ke level 1</p>
           </aside>
         </div>
+        <div id="office-panel" class="office-panel" role="tabpanel" aria-label="Kantor dari atas"></div>
       </section>
 
       <section class="controls" aria-label="Kontrol counter">
+        <p class="active-counter" id="active-counter" aria-live="polite">JONATHAN · LARPING COUNT</p>
         <div class="action-buttons">
-          <button id="hit-button" class="hit-button" type="button" disabled><span class="button-plus">+1</span><span class="button-copy">TAMBAH LARP <span aria-hidden="true">↗</span></span></button>
-          <button id="forgive-button" class="forgive-button" type="button" disabled><span class="button-plus">−1</span><span>UDAH MINTA<br>MAAF <span aria-hidden="true">♡</span></span></button>
+          <button id="hit-button" class="hit-button" type="button" disabled><span class="button-plus">+1</span><span class="button-copy"><span id="action-label">TAMBAH LARP</span><span aria-hidden="true">↗</span></span></button>
+          <button id="forgive-button" class="forgive-button" type="button" disabled><span class="button-plus">−1</span><span id="undo-label">UDAH MINTA MAAF ♡</span></button>
         </div>
         <div class="next-damage"><span class="next-icon" aria-hidden="true">✳</span><p><strong id="next-count">3 larp</strong><span id="next-copy"> lagi sampai makin bonyok.</span></p><span class="step-badge">TIAP <span id="step-value">3</span> LARP</span></div>
         <p class="feedback" id="feedback" role="status" aria-live="polite"></p>
       </section>
     </main>
 
-    <footer><span>15 LEVELS. ZERO LIFE LESSONS.</span><span>PIXELS HURT. APOLOGIES HEAL. <span class="red" aria-hidden="true">✳</span></span></footer>
+    <footer><span>6 KURSI. 5 COUNTER. 1 HANTU.</span><span>SATU KANTOR, BANYAK TINGKAH. <span class="red" aria-hidden="true">✳</span></span></footer>
   </div>
 
   <dialog id="admin-dialog" aria-labelledby="dialog-title" aria-describedby="dialog-description">
@@ -112,7 +78,7 @@
       <div class="dialog-top"><span class="eyebrow">AUTHORIZED PERSONNEL ONLY</span><button class="close-dialog" id="close-dialog" aria-label="Tutup" type="button">×</button></div>
       <h2 id="dialog-title">Area berwenang.</h2>
       <p id="dialog-description">Masukkan password untuk melanjutkan.</p>
-      <div id="step-field"><label for="damage-step">Bonyok setiap berapa larp?</label><div class="number-input"><input id="damage-step" type="number" min="1" max="1000" step="1" inputmode="numeric" required><span>LARP</span></div><p class="field-hint">Mengubah kelipatan langsung menyesuaikan kondisi Jonathan.</p></div>
+      <div id="step-field"><label for="damage-step" id="step-question">Naik level setiap berapa count?</label><div class="number-input"><input id="damage-step" type="number" min="1" max="1000" step="1" inputmode="numeric" required><span>COUNT</span></div><p class="field-hint">Kelipatan berlaku untuk karakter yang dipilih dan langsung menyesuaikan kondisinya.</p></div>
       <label for="admin-password">Password</label>
       <input id="admin-password" type="password" autocomplete="current-password" placeholder="Yang tahu aja." maxlength="256" required>
       <p id="admin-error" class="admin-error" role="alert"></p>
