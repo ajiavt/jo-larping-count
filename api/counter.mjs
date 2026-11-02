@@ -7,6 +7,9 @@ const stateScript = `
     local count = tonumber(redis.call('HGET', KEYS[1], 'count') or '0')
     if count >= 9007199254740991 then return redis.error_reply('Counter limit reached') end
     redis.call('HINCRBY', KEYS[1], 'count', 1)
+  elseif action == 'forgive' then
+    local count = tonumber(redis.call('HGET', KEYS[1], 'count') or '0')
+    if count > 0 then redis.call('HINCRBY', KEYS[1], 'count', -1) end
   elseif action == 'reset' then
     redis.call('HSET', KEYS[1], 'count', 0)
   elseif action == 'settings' then
@@ -77,12 +80,12 @@ export default {
         try { body = JSON.parse(text); } catch {
           return json({ error: 'JSON tidak valid.' }, 400);
         }
-        if (!body || typeof body !== 'object' || !['hit', 'reset', 'settings'].includes(body.action)) {
+        if (!body || typeof body !== 'object' || !['hit', 'forgive', 'reset', 'settings'].includes(body.action)) {
           return json({ error: 'Aksi tidak valid.' }, 400);
         }
         action = body.action;
 
-        if (action !== 'hit') {
+        if (action === 'reset' || action === 'settings') {
           if (!process.env.ADMIN_PASSWORD) {
             return json({ error: 'Password admin belum dikonfigurasi.' }, 503);
           }
