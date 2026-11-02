@@ -27,7 +27,7 @@ Tanpa konfigurasi Redis, halaman tetap bisa dibuka tetapi tombol `+1` dinonaktif
 
 1. Import repository ini di Vercel dengan framework preset **Other**. `vercel.json` sudah mengatur output `public`; tidak diperlukan build command.
 2. Buat atau hubungkan Upstash Redis melalui Vercel Marketplace. Pilih paket dan batas biaya yang sesuai; aplikasi tidak otomatis membuat layanan berbayar.
-3. Tambahkan tiga environment variable dari `.env.example`. Jika integrasi memakai prefix berbeda, petakan URL dan token ke nama `UPSTASH_REDIS_REST_URL` dan `UPSTASH_REDIS_REST_TOKEN`.
+3. Integrasi Upstash Vercel otomatis mengisi `KV_REST_API_URL` dan `KV_REST_API_TOKEN`; aplikasi langsung mendukung keduanya. Untuk setup manual, gunakan `UPSTASH_REDIS_REST_URL` dan `UPSTASH_REDIS_REST_TOKEN` dari `.env.example`.
 4. Isi `ADMIN_PASSWORD` dengan password yang ditentukan pemilik pada environment Production (dan Preview jika dibutuhkan).
 5. Deploy atau redeploy setelah environment variable disimpan.
 
