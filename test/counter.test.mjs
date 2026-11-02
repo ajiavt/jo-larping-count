@@ -46,6 +46,12 @@ test('counter API guards mutations and uses atomic storage', async (t) => {
   assert.match(commands.at(-1)[1], /HINCRBY/);
   assert.equal(commands.at(-1)[4], 'hit');
 
+  const beforeForgive = commands.length;
+  assert.equal((await post({ action: 'forgive' })).status, 200);
+  assert.equal(commands.length, beforeForgive + 1, 'forgiveness does not require admin authentication');
+  assert.equal(commands.at(-1)[4], 'forgive');
+  assert.equal((await post({ action: 'forgive' }, 'https://other.example')).status, 403);
+
   assert.equal((await post({ action: 'reset', password: 'test-password' })).status, 200);
   assert.equal(commands.at(-1)[4], 'reset');
   assert.equal((await post({ action: 'settings', password: 'test-password', step: 5 })).status, 200);
