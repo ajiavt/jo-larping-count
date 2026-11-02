@@ -1,12 +1,17 @@
 # Larping Count
 
-Satu Jonathan, satu tombol `+1`, satu counter untuk semua pengunjung.
+Jonathan memenuhi arena satu layar, dengan counter bersama untuk semua pengunjung.
 
 ## Perilaku
 
 - `+1` menambah counter bersama dan memberi Jonathan animasi damage.
 - Setiap kelipatan 3 menaikkan level damage. Kelipatan bisa diganti menjadi 1–1.000.
-- Ada enam tahap luka visual, lalu tampilan bonyok maksimal. Counter dan level tetap bertambah.
+- Ada 15 level luka visual, dari lecet sampai bonyok legendaris. Level berhenti di 15; counter tetap bertambah. Dengan kelipatan default 3, level 15 tercapai di 45 larp.
+- `−1 · Udah minta maaf` mengurangi counter bersama satu angka, minimal 0. Level dan luka ikut pulih ketika melewati batas kelipatan. Tombol ini terbuka untuk semua pengunjung.
+- Combo lokal menghitung hit yang dikonfirmasi berurutan dalam 2,2 detik. Combo hanya efek permainan, tidak menggandakan penambahan counter.
+- Ada partikel, animasi kena hit/pulih, progres level, dan banner naik level. `prefers-reduced-motion` mengurangi animasi.
+- Suara arcade dibuat dengan Web Audio setelah interaksi pengguna; tombol sound/mute tersimpan per browser. Pembaruan dari pengunjung lain tidak mengeluarkan suara.
+- Desktop menempatkan karakter besar di tengah, counter di kiri, kondisi di kanan, dan utilitas di kanan atas. Di HP, panel ringkas di atas karakter menjaga tombol utama terlihat; layar sangat pendek dapat digulir.
 - Reset mengembalikan counter ke 0 dan memulihkan Jonathan; kelipatan tidak diubah.
 - Reset dan setting selalu memerlukan password yang diverifikasi di server.
 - Pengunjung lain menerima pembaruan paling lambat sekitar 8 detik ketika tab aktif.
@@ -42,7 +47,9 @@ Tes belum dijalankan atas permintaan pemilik. Test API ringan tersedia lewat `np
 Cek manual yang disarankan:
 
 - Buka dua browser: `+1` di satu browser harus tersinkron ke browser lain.
-- Klik sampai 3, 6, 9, 12, 15, dan 18 untuk melihat enam tahap bonyok.
+- Klik sampai setiap kelipatan 3 hingga 45 untuk melihat 15 tahap bonyok; setelah 45, level tetap 15 dan counter lanjut.
+- Klik `−1` sampai 0: angka tidak boleh negatif; cek dua browser untuk memastikan pengurangan tersinkron dan level ikut pulih.
+- Cek combo, suara hit/naik level/pulih, tombol mute, dan preferensi suara setelah refresh.
 - Password salah harus menolak reset dan setting tanpa mengubah data.
 - Ubah kelipatan ke 2: kondisi langsung dihitung ulang dari counter yang sama.
 - Reset dengan password yang benar: semua browser kembali 0, kelipatan tetap.
@@ -51,6 +58,6 @@ Cek manual yang disarankan:
 
 ## Batas sederhana
 
-Tombol `+1` memang terbuka untuk siapa saja; ini counter iseng, bukan sistem voting anti-bot. Satu browser menunggu konfirmasi hit sebelum mengirim hit berikutnya. Jika koneksi putus setelah request dikirim, aplikasi tidak mengulang hit otomatis agar tidak menambah dua kali; tunggu sinkronisasi untuk melihat angka yang tersimpan.
+Tombol `+1` dan `−1` memang terbuka untuk siapa saja; ini counter iseng, bukan sistem voting anti-bot. Satu browser menunggu konfirmasi perubahan sebelum mengirim perubahan berikutnya. Jika koneksi putus setelah request dikirim, aplikasi tidak mengulang otomatis dan menunggu sinkronisasi sebelum mengaktifkan tombol lagi.
 
 Dokumentasi platform: [Vercel Node.js Functions](https://vercel.com/docs/functions/runtimes/node-js) dan [Upstash REST API](https://upstash.com/docs/redis/features/restapi).
