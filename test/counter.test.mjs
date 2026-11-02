@@ -7,10 +7,12 @@ test('counter API guards mutations and uses atomic storage', async (t) => {
   const originalEnv = { ...process.env };
   process.env.UPSTASH_REDIS_REST_URL = 'https://redis.example';
   process.env.UPSTASH_REDIS_REST_TOKEN = 'test-token';
+  delete process.env.KV_REST_API_URL;
+  delete process.env.KV_REST_API_TOKEN;
   process.env.ADMIN_PASSWORD = 'test-password';
   t.after(() => {
     globalThis.fetch = originalFetch;
-    for (const name of ['UPSTASH_REDIS_REST_URL', 'UPSTASH_REDIS_REST_TOKEN', 'ADMIN_PASSWORD']) {
+    for (const name of ['UPSTASH_REDIS_REST_URL', 'UPSTASH_REDIS_REST_TOKEN', 'KV_REST_API_URL', 'KV_REST_API_TOKEN', 'ADMIN_PASSWORD']) {
       if (originalEnv[name] === undefined) delete process.env[name];
       else process.env[name] = originalEnv[name];
     }
@@ -51,10 +53,16 @@ test('counter API guards mutations and uses atomic storage', async (t) => {
   assert.equal((await counter.fetch(new Request('https://larp.example/api/counter'))).status, 200);
   assert.equal(commands.at(-1)[4], 'read');
 
+  delete process.env.UPSTASH_REDIS_REST_URL;
+  delete process.env.UPSTASH_REDIS_REST_TOKEN;
+  process.env.KV_REST_API_URL = 'https://redis.example';
+  process.env.KV_REST_API_TOKEN = 'test-token';
+  assert.equal((await post({ action: 'hit' })).status, 200, 'Vercel integration variables work without manual aliases');
+
   globalThis.fetch = async () => Response.json({ result: 11 });
   assert.equal((await post({ action: 'reset', password: 'test-password' })).status, 429);
   globalThis.fetch = async () => { throw new Error('offline'); };
   assert.equal((await post({ action: 'hit' })).status, 503);
-  delete process.env.UPSTASH_REDIS_REST_TOKEN;
+  delete process.env.KV_REST_API_TOKEN;
   assert.equal((await post({ action: 'hit' })).status, 503);
 });
