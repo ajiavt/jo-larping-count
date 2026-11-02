@@ -124,7 +124,7 @@ export function personSprite(id, inputLevel=0) {
   const person = people.find((entry)=>entry.id===id) || people[0];
   const level = Math.max(0,Math.min(15,inputLevel));
   const stage=Math.floor(level/3);
-  let art = base.replaceAll('#f0c399',person.skin).replaceAll('#3f5668',person.shirt).replace('<g class="shirt-mark"></g>',initialMark(person.name[0].toUpperCase()));
+  let art = base.replaceAll('#f0c399',person.skin).replaceAll('#3f5668',person.shirt).replace('<g class="shirt-mark"></g>',initialMark(person.name[0].toUpperCase(),29,44,id==='agung' && level<7?'#635843':'#eee6c9'));
   if (id !== 'jonathan') art=art.replace(/<g class="injury" data-injury="\d+">[\s\S]*?<\/g>/g,'');
   else art=art.replace(/class="injury" data-injury="(\d+)"/g,(_,value)=>`class="injury${Number(value)<=level?' visible':''}" data-injury="${value}"`);
   let behind='',front='',pose='',copies='';
