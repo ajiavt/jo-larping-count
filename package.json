@@ -1,0 +1,11 @@
+{
+  "name": "larping-count",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": "22.x" },
+  "scripts": {
+    "dev": "node --env-file-if-exists=.env.local scripts/dev.mjs",
+    "test": "node --test"
+  }
+}
